@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 with open(os.path.expanduser('~/servers/etc/openbench-key.txt')) as f:
     SECRET_KEY = f.read().strip()
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 

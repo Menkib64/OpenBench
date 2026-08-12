@@ -1007,11 +1007,13 @@ def server_configure_fastchess(config):
 def server_configure_match_runner(config, name, build_func):
 
     # OpenBench Server holds the runner repo and git-ref
-    print ('\nConfiguring %s...' % name)
+    print (f'\nConfiguring {name}... with {config}')
     print ('> Requesting %s configuration from openbench' % name)
     target  = url_join(config.server, 'clientMatchRunnerVersionRef')
     payload = { 'username' : config.username, 'password' : config.password }
     data    = requests.post(target, data=payload, timeout=TIMEOUT_HTTP).json()
+
+    print(json.dumps(data, indent=4))
 
     # Might already have a sufficiently new Fastchess binary
     print ('> Checking for existing %s-ob binary' % name)
