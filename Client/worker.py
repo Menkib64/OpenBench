@@ -1034,6 +1034,8 @@ def server_configure_match_runner(config, name, build_func):
     print ('> Downloading %s from %s' % (repo_ref, repo_url))
     response = requests.get(url_join(repo_url, 'archive', '%s.zip' % repo_ref))
 
+    print (f"{response.url} {response.status_code} {len(response.content)} bytes")
+
     with tempfile.TemporaryDirectory() as temp_dir:
 
         # Move the .zip contents into a temporary .zip file
