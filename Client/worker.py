@@ -407,10 +407,11 @@ class MatchRunner:
         no_reverse      = is_datagen and not config.workload['test']['play_reverses']
         games_per_round = 1 if no_reverse else 2
         runner_cnt      = config.workload['distribution']['runner-count']
+        round_mult      = 2 if runner_cnt > 1 else 1
 
         return '-concurrency %d -rounds %d -games %d' % (
             config.workload['distribution']['concurrency-per'],
-            config.workload['distribution']['rounds-per-runner'] * 2 if runner_cnt > 1 else 1,
+            config.workload['distribution']['rounds-per-runner'] * round_mult,
             games_per_round,
         )
 
