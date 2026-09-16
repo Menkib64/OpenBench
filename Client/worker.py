@@ -691,11 +691,16 @@ class ResultsReporter(object):
             except queue.Empty: return False
 
         # Collect results until all Tasks are done
-        while runner_cnt > 0 and any(not task.done() for task in self.tasks):
+        while any(not task.done() for task in self.tasks):
 
             result = get_next_result()
             if result and result['done']:
                 runner_cnt = runner_cnt - 1
+                if runner_cnt <= 1:
+                    batch_done.set()
+
+            if any(task.done() for task in self.tasks):
+                batch_done.set()
 
             if result:
                 self.pending.append(result)
@@ -707,9 +712,6 @@ class ResultsReporter(object):
             # Kill everything if openbench.exit is created
             if os.path.isfile('openbench.exit'):
                 return self.abort_flag.set()
-
-        if any(not task.done() for task in self.tasks):
-            batch_done.set()
 
         # Exhaust the Results Queue completely since Tasks are done
         while True:
