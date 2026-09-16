@@ -255,8 +255,9 @@ def workload_to_dictionary(test, result, machine):
         runner_cnt    = workload['distribution']['runner-count']
         pairs_per_cnt = workload['distribution']['rounds-per-runner']
         per_opening   = 2 if (test.test_mode == 'DATAGEN' and not test.play_reverses) else 1
+        loadbalancing_mult = 1 if runner_cnt == 1 else 1.1
 
-        test.book_index += runner_cnt * pairs_per_cnt * per_opening
+        test.book_index += runner_cnt * math.ceil(pairs_per_cnt * loadbalancing_mult) * per_opening
 
         if test.test_mode == 'DATAGEN':
             workload['test']['genfens_seeds'] = [

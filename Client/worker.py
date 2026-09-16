@@ -40,6 +40,7 @@ import time
 import traceback
 import uuid
 import zipfile
+import math
 
 from subprocess import PIPE, Popen, call, STDOUT
 from itertools import combinations_with_replacement
@@ -407,11 +408,11 @@ class MatchRunner:
         no_reverse      = is_datagen and not config.workload['test']['play_reverses']
         games_per_round = 1 if no_reverse else 2
         runner_cnt      = config.workload['distribution']['runner-count']
-        round_mult      = 2 if runner_cnt > 1 else 1
+        round_mult      = 1.1 if runner_cnt > 1 else 1
 
         return '-concurrency %d -rounds %d -games %d' % (
             config.workload['distribution']['concurrency-per'],
-            config.workload['distribution']['rounds-per-runner'] * round_mult,
+            math.ceil(config.workload['distribution']['rounds-per-runner'] * round_mult),
             games_per_round,
         )
 
@@ -440,13 +441,15 @@ class MatchRunner:
 
     @staticmethod
     def book_settings(config, runner_idx):
+        runner_cnt = config.workload['distribution']['runner-count']
+        round_mult = 1.1 if runner_cnt > 1 else 1
 
         # DATAGEN creates their own book
         if config.workload['test']['type'] == 'DATAGEN':
 
             # -repeat might not be applied, so handle the book offsets
             no_reverse = not config.workload['test']['play_reverses']
-            pairs      = config.workload['distribution']['rounds-per-runner']
+            pairs      = math.ceil(config.workload['distribution']['rounds-per-runner'] * round_mult)
             start      = 1 + runner_idx * pairs
             return '-openings file=Books/openbench.genfens.epd format=epd order=sequential start=%d' % (start)
 
@@ -456,7 +459,7 @@ class MatchRunner:
 
         # Start position is determined partially by runner index
         pairs = config.workload['distribution']['rounds-per-runner']
-        start = config.workload['test']['book_index'] + runner_idx * pairs
+        start = config.workload['test']['book_index'] + runner_idx * math.ceil(pairs * round_mult)
 
         return '-openings file=Books/%s format=%s order=random start=%d -srand %d' % (
             book_name, book_suffix, start, config.workload['test']['book_seed'])
